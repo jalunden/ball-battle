@@ -40,7 +40,7 @@ const BALL_BATTLE_API='https://ball-battle-api.lunkki79.workers.dev/event';
 function trackGameEvent(type,outcome=''){
   try{
     if(!navigator.onLine)return;
-    const payload={id:crypto.randomUUID(),type,world:world.value,season:currentSeason(),ball:ballchoice.value,outcome};
+    const payload={id:crypto.randomUUID(),type,world:world.value,season:currentSeason(),ball:document.getElementById('ballchoice')?.value||'',outcome};
     fetch(BALL_BATTLE_API,{method:'POST',mode:'cors',headers:{'content-type':'application/json'},body:JSON.stringify(payload),keepalive:true}).catch(()=>{});
   }catch(e){}
 }

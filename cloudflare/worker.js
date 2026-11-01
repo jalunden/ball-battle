@@ -6,7 +6,7 @@ const ORIGIN = 'https://jalunden.github.io';
 const TYPES = new Set(['page_view','match_start','match_end']);
 const safe = (s, max=48) => typeof s === 'string' ? s.slice(0,max).replace(/[^a-zA-Z0-9_:-]/g,'') : '';
 const json = (data,status=200,headers={}) => new Response(JSON.stringify(data),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store',...headers}});
-const cors = {'access-control-allow-origin':ORIGIN,'access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'content-type','vary':'Origin'};
+const cors = {'access-control-allow-origin':ORIGIN,'access-control-allow-methods':'POST,OPTIONS','access-control-allow-headers':'content-type,authorization','vary':'Origin'};
 function sameSecret(a,b){
   if(!a||!b)return false;
   const e=new TextEncoder(),x=e.encode(a),y=e.encode(b);
@@ -17,7 +17,7 @@ function sameSecret(a,b){
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='OPTIONS' && url.pathname==='/event')
+    if(request.method==='OPTIONS' && (url.pathname==='/event'||url.pathname==='/stats') && origin===ORIGIN)
       return new Response(null,{status:204,headers:cors});
     if(url.pathname==='/event'){
       if(request.method!=='POST')return json({error:'method'},405,cors);
@@ -36,10 +36,10 @@ export default {
       }catch{return json({error:'database'},503,cors)}
     }
     if(url.pathname==='/stats'){
-      if(request.method!=='GET')return json({error:'method'},405);
-      if(!env.ADMIN_TOKEN)return json({error:'admin token not configured'},503);
+      if(request.method!=='GET')return json({error:'method'},405,cors);
+      if(!env.ADMIN_TOKEN)return json({error:'admin token not configured'},503,cors);
       const provided=(request.headers.get('authorization')||'').replace(/^Bearer\s+/i,'');
-      if(!sameSecret(provided,env.ADMIN_TOKEN))return json({error:'unauthorized'},401);
+      if(!sameSecret(provided,env.ADMIN_TOKEN))return json({error:'unauthorized'},401,cors);
       try{
         const [totals,days,worlds,balls,seasons]=await Promise.all([
           env.DB.prepare("SELECT SUM(event_type='page_view') AS views, SUM(event_type='match_start') AS starts, SUM(event_type='match_end') AS finished, SUM(outcome='win') AS wins, SUM(outcome='loss') AS losses, SUM(outcome='draw') AS draws FROM game_events").first(),
@@ -48,8 +48,8 @@ export default {
           env.DB.prepare("SELECT ball AS name, COUNT(*) AS count FROM game_events WHERE event_type='match_start' AND ball<>'' GROUP BY ball ORDER BY count DESC LIMIT 12").all(),
           env.DB.prepare("SELECT season AS name, COUNT(*) AS count FROM game_events WHERE event_type='match_start' AND season<>'' GROUP BY season ORDER BY count DESC LIMIT 12").all()
         ]);
-        return json({totals,days:days.results,worlds:worlds.results,balls:balls.results,seasons:seasons.results});
-      }catch{return json({error:'database'},503)}
+        return json({totals,days:days.results,worlds:worlds.results,balls:balls.results,seasons:seasons.results},200,cors);
+      }catch{return json({error:'database'},503,cors)}
     }
     return json({service:'Ball Battle API',status:'ready'});
   }

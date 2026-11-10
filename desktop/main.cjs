@@ -4,7 +4,6 @@ const path = require('node:path');
 
 const gameFile = path.join(__dirname, '..', 'index.html');
 app.setName('Ball Battle');
-app.commandLine.appendSwitch('disable-features', 'OutOfBlinkCors'); // no remote web content is loaded
 
 function createWindow() {
   const win = new BrowserWindow({

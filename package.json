@@ -24,7 +24,8 @@
       "index.html",
       "assets/**/*",
       "desktop/main.cjs",
-      "package.json"
+      "package.json",
+      "build/icon.ico"
     ],
     "asar": true,
     "win": {
@@ -36,7 +37,8 @@
           ]
         }
       ],
-      "artifactName": "BallBattle-Setup-${version}.${ext}"
+      "artifactName": "BallBattle-Setup-${version}.${ext}",
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": false,

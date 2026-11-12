@@ -1,6 +1,6 @@
 {
   "name": "ball-battle-desktop",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Ball Battle Windows Edition",
   "main": "desktop/main.cjs",
   "private": true,
@@ -45,7 +45,8 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Ball Battle"
+      "shortcutName": "Ball Battle",
+      "deleteAppDataOnUninstall": false
     },
     "publish": null
   }

@@ -9,6 +9,7 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1280, height: 850, minWidth: 900, minHeight: 620,
     backgroundColor: '#111b37', autoHideMenuBar: true,
+    icon: path.join(__dirname, '..', 'build', 'icon.ico'),
     title: 'Ball Battle – Windows Edition',
     webPreferences: {
       nodeIntegration: false, contextIsolation: true,
